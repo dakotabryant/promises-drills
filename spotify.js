@@ -11,13 +11,20 @@ var getFromApi = function(endpoint, query={}) {
 
 var artist;
 var getArtist = function(name) {
-    return getFromApi('search',{q: name, limit: 1, type: 'artist'})
+    return getFromApi('search',{q: name, limit: 10, type: 'artist'})
     .then(response => {
-        console.log(response.artists.items[0].id);
     //   return response.artists.items[0];
-      let id = response.artists.items[0].id;
-      console.log(`https://api.spotify.com/v1/artists/${id}/related-artists`);
-    //   return fetch(`https://api.spotify.com/v1/artists/${id}/related-artists`);
+      artist = response.artists.items[0];
+      let id = artist.id;
+      // console.log(`this is response 1 ${response}`);
+      // console.log(response);
+      console.log(artist, "hey, this is the 1st");
+      return getFromApi(`artists/${id}/related-artists`, {q: name, limit: 10, type: 'artist'});
+    }).then(relatedResponse => {
+      // console.log(`this is response 2 ${response}`);
+        artist.related = relatedResponse.artists;
+        return artist;
+
     }).catch(err => {
       console.error(err);
     });
