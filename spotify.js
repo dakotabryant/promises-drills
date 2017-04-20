@@ -18,13 +18,21 @@ var getArtist = function(name) {
       let id = artist.id;
       // console.log(`this is response 1 ${response}`);
       // console.log(response);
-      console.log(artist, "hey, this is the 1st");
       return getFromApi(`artists/${id}/related-artists`, {q: name, limit: 10, type: 'artist'});
     }).then(relatedResponse => {
-      // console.log(`this is response 2 ${response}`);
+    
         artist.related = relatedResponse.artists;
-        return artist;
-
+       
+        var relatedArtistsId = artist.related.map(val => {
+            return getFromApi(`artists/${val.id}/top-tracks`, {country: 'US'});
+        });
+    
+       const allPromise = Promise.all(relatedArtistsId);
+            return allPromise.then(response => {
+                artist.tracks = response.tracks;
+                return artist;
+            });
+        
     }).catch(err => {
       console.error(err);
     });
